@@ -6,7 +6,8 @@ public enum TFErrorCode {
     PRICE_NOT_FOUND(-1003, "Price not available for the trading pair"),
     USER_NOT_FOUND(-1004, "User not existed"),
     SUCCESS(0, "Success"),
-    UNKNOWN_ERROR(-999, "An unknown error occurred");
+    UNKNOWN_ERROR(-999, "An unknown error occurred"),
+    INTERNAL_SERVER_ERROR(-998, "An unknown error occurred");
 
     private final int code;
     private final String message;
