@@ -1,5 +1,7 @@
 package com.aquariux.trading_platform.controller;
 
+import com.aquariux.trading_platform.expection.TFException;
+import com.aquariux.trading_platform.model.TFResponse;
 import com.aquariux.trading_platform.model.UserBalance;
 import com.aquariux.trading_platform.service.UserWalletService;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,7 +19,7 @@ public class UserController {
     }
 
     @GetMapping("/balance")
-    public UserBalance getBalance(@RequestHeader("TF-USER") long userId){
-        return userWalletService.getBalance(userId);
+    public TFResponse getBalance(@RequestHeader("TF-USER") long userId) throws TFException {
+        return TFResponse.builder().data(userWalletService.getBalance(userId)).build();
     }
 }

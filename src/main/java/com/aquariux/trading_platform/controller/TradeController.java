@@ -2,6 +2,8 @@ package com.aquariux.trading_platform.controller;
 
 
 import com.aquariux.trading_platform.entity.AggregatedPrice;
+import com.aquariux.trading_platform.expection.TFException;
+import com.aquariux.trading_platform.model.TFResponse;
 import com.aquariux.trading_platform.model.TradeCommand;
 import com.aquariux.trading_platform.model.UserBalance;
 import com.aquariux.trading_platform.service.PriceAggregationService;
@@ -17,7 +19,6 @@ import java.util.List;
 @RequestMapping("/api/trade")
 public class TradeController {
 
-
     private final TradingService tradingService;
 
     public TradeController(TradingService tradingService) {
@@ -25,8 +26,10 @@ public class TradeController {
     }
 
 
-    @PostMapping("/send")
-    public ResponseEntity<String> executeTrade(@RequestBody TradeCommand body) {
-        return ResponseEntity.ok(tradingService.executeTrade(body.getUserId(), body.getTradingPair(), body.getOrderType(), body.getQuantity()));
+    @PostMapping("/order")
+    public TFResponse executeTrade(@RequestBody TradeCommand body) throws TFException {
+        tradingService.executeTrade(body.getUserId(), body.getTradingPair(), body.getOrderType(),
+                body.getQuantity());
+        return TFResponse.builder().build();
     }
 }

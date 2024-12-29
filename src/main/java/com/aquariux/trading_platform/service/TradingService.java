@@ -3,6 +3,9 @@ package com.aquariux.trading_platform.service;
 import com.aquariux.trading_platform.entity.AggregatedPrice;
 import com.aquariux.trading_platform.entity.Transaction;
 import com.aquariux.trading_platform.entity.UserWallet;
+import com.aquariux.trading_platform.expection.TFErrorCode;
+import com.aquariux.trading_platform.expection.TFException;
+import com.aquariux.trading_platform.model.TFResponse;
 import com.aquariux.trading_platform.model.UserBalance;
 import com.aquariux.trading_platform.repository.AggregatedPriceRepository;
 import com.aquariux.trading_platform.repository.UserWalletRepository;
@@ -28,13 +31,15 @@ public class TradingService {
     }
 
     @Transactional
-    public String executeTrade(Long userId,String tradingPair, String orderType, Double quantity) {
+    public void executeTrade(Long userId, String tradingPair, String orderType, Double quantity) throws TFException {
+        var response = TFResponse.builder();
         AggregatedPrice price = priceAggregationService.findByTradingPair(tradingPair);
-        Map<String, Double> balance = userWalletService.getBalance(userId).getBalance(); // <symbol, balance>
+        var userWallet = userWalletService.getBalance(userId);
 
-        if (price == null || balance.isEmpty()) {
-            return "Invalid trading pair or user ID";
+        if (price == null || userWallet == null) {
+            throw new TFException(TFErrorCode.INVALID_TRADING_PAIR_OR_USER_ID);
         }
+        var balance = userWallet.getBalance();
 
         double tradePrice = orderType.equals("BUY") ? price.getAskPrice() : price.getBidPrice();
         var newBalance = balance;
@@ -54,7 +59,7 @@ public class TradingService {
                 }
                 break;
             default:
-                throw new RuntimeException("Invalid trading pair");
+                throw new TFException(TFErrorCode.INVALID_TRADING_PAIR_OR_USER_ID);
         }
 
         userWalletService.updateBalance(userId, newBalance);
@@ -67,15 +72,14 @@ public class TradingService {
         transaction.setQuantity(quantity);
         transaction.setTimestamp(LocalDateTime.now());
         transactionService.insertTransaction(transaction);
-        return "Trade executed successfully";
     }
 
-    private Map<String, Double> buy(String source, String dest, Map<String, Double> balance, double quantity, double tradePrice) {
+    private Map<String, Double> buy(String source, String dest, Map<String, Double> balance, double quantity, double tradePrice) throws TFException {
         double totalCost = tradePrice * quantity;
         var balanceSource = balance.get(source);
 
         if(balanceSource < totalCost) {
-            throw new RuntimeException("Insufficient " + source + " balance");
+            throw new TFException(TFErrorCode.INSUFFICIENT_BALANCE);
         }
 
         balance.replace(source, balanceSource - totalCost);
@@ -84,12 +88,12 @@ public class TradingService {
     }
 
     private Map<String, Double> sell(String source, String dest, Map<String, Double> balance, double quantity,
-                      double tradePrice) {
+                      double tradePrice) throws TFException {
         double totalCost = tradePrice * quantity;
         var balanceSource = balance.get(source);
 
         if (quantity > balanceSource) {
-            throw new RuntimeException("Insufficient " + source + " balance");
+            throw new TFException(TFErrorCode.INSUFFICIENT_BALANCE);
         }
         balance.replace(source, balanceSource - quantity);
         balance.replace(dest, balance.getOrDefault(dest, 0.0) + totalCost);

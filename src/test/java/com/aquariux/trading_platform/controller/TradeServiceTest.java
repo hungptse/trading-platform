@@ -74,53 +74,52 @@ public class TradeServiceTest {
         verify(transactionService).insertTransaction(any(Transaction.class));
     }
 
-//    @Test
-//    void testExecuteTrade_InvalidTradingPair() {
-//        Long userId = 1L;
-//        String tradingPair = "INVALID";
-//        String orderType = "BUY";
-//        Double quantity = 0.1;
-//
-//        // Mock aggregated price not found
-//        when(priceAggregationService.findByTradingPair(tradingPair)).thenReturn(null);
-//
-//        // Execute the trade
-//        String result = tradeService.executeTrade(userId, tradingPair, orderType, quantity);
-//
-//        // Verify results
-//        assertEquals("Invalid trading pair or user ID", result);
-//        verify(priceAggregationService).findByTradingPair(tradingPair);
-//        verifyNoInteractions(userWalletService);
-//        verifyNoInteractions(transactionService);
-//    }
-//
-//    @Test
-//    void testExecuteTrade_InsufficientBalance() {
-//        Long userId = 1L;
-//        String tradingPair = "BTCUSDT";
-//        String orderType = "BUY";
-//        Double quantity = 2.0;
-//
-//        // Mock aggregated price
-//        AggregatedPrice price = new AggregatedPrice();
-//        price.setTradingPair(tradingPair);
-//        price.setAskPrice(30000.0);
-//        price.setBidPrice(29900.0);
-//        when(priceAggregationService.findByTradingPair(tradingPair)).thenReturn(price);
-//
-//        // Mock user wallet balance
-//        Map<String, Double> balance = new HashMap<>();
-//        balance.put("USDT", 1000.0); // Not enough to buy
-//        balance.put("BTC", 0.0);
-//        when(userWalletService.getBalance(userId)).thenReturn(new WalletResponse(balance));
-//
-//        // Execute the trade
-//        String result = tradeService.executeTrade(userId, tradingPair, orderType, quantity);
-//
-//        // Verify results
-//        assertEquals("Invalid trading pair or user ID", result); // Adjust if custom error is implemented for insufficient funds
-//        verify(priceAggregationService).findByTradingPair(tradingPair);
-//        verify(userWalletService).getBalance(userId);
-//        verifyNoInteractions(transactionService);
-//    }
+    @Test
+    void testExecuteTrade_InvalidTradingPair() {
+        Long userId = 1000L;
+        String tradingPair = "INVALID";
+        String orderType = "BUY";
+        Double quantity = 0.1;
+
+        // Mock aggregated price not found
+        when(priceAggregationService.findByTradingPair(tradingPair)).thenReturn(null);
+
+        // Execute the trade
+        String result = tradeService.executeTrade(userId, tradingPair, orderType, quantity);
+
+        // Verify results
+        assertEquals("Invalid trading pair or user ID", result);
+        verify(priceAggregationService).findByTradingPair(tradingPair);
+        verifyNoInteractions(transactionService);
+    }
+
+    @Test
+    void testExecuteTrade_InsufficientBalance() {
+        Long userId = 1000L;
+        String tradingPair = "BTCUSDT";
+        String orderType = "BUY";
+        Double quantity = 2.0;
+
+        // Mock aggregated price
+        AggregatedPrice price = new AggregatedPrice();
+        price.setTradingPair(tradingPair);
+        price.setAskPrice(30000.0);
+        price.setBidPrice(29900.0);
+        when(priceAggregationService.findByTradingPair(tradingPair)).thenReturn(price);
+
+        // Mock user wallet balance
+        Map<String, Double> balance = new HashMap<>();
+        balance.put("USDT", 1000.0);
+        balance.put("BTC", 0.0);
+        when(userWalletService.getBalance(userId)).thenReturn(new UserBalance(userId, balance));
+
+        // Execute the trade
+        String result = tradeService.executeTrade(userId, tradingPair, orderType, quantity);
+
+        // Verify results
+        assertEquals("Invalid trading pair or user ID", result);
+        verify(priceAggregationService).findByTradingPair(tradingPair);
+        verify(userWalletService).getBalance(userId);
+        verifyNoInteractions(transactionService);
+    }
 }

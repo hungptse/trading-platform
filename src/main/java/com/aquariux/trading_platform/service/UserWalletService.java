@@ -1,6 +1,8 @@
 package com.aquariux.trading_platform.service;
 
 import com.aquariux.trading_platform.entity.UserWallet;
+import com.aquariux.trading_platform.expection.TFErrorCode;
+import com.aquariux.trading_platform.expection.TFException;
 import com.aquariux.trading_platform.model.UserBalance;
 import com.aquariux.trading_platform.repository.UserWalletRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -20,10 +22,10 @@ public class UserWalletService {
         this.userWalletRepository = userWalletRepository;
     }
 
-    public UserBalance getBalance(Long userId) {
+    public UserBalance getBalance(Long userId) throws TFException {
         var userWallet = userWalletRepository.findById(userId);
         if (userWallet.isEmpty()) {
-            throw new RuntimeException("User not found");
+            throw new TFException(TFErrorCode.USER_NOT_FOUND);
         }
         var userBalance = new UserBalance();
         userBalance.setUserId(userId);

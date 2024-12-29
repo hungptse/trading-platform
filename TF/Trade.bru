@@ -5,7 +5,7 @@ meta {
 }
 
 post {
-  url: http://localhost:8080/api/trade/send
+  url: http://localhost:8080/api/trade/order
   body: json
   auth: none
 }
@@ -16,9 +16,9 @@ headers {
 
 body:json {
   {
-    "tradingPair" : "BTCUSDT",
+    "tradingPair" : "ETHUSDT",
     "orderType" : "BUY",
-    "quantity" : 0.1,
+    "quantity" : 1,
     "userId" : 1000
   } 
 }

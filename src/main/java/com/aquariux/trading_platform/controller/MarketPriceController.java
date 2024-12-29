@@ -1,7 +1,9 @@
 package com.aquariux.trading_platform.controller;
 
 import com.aquariux.trading_platform.entity.AggregatedPrice;
+import com.aquariux.trading_platform.model.TFResponse;
 import com.aquariux.trading_platform.service.PriceAggregationService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,7 +22,7 @@ public class MarketPriceController {
     }
 
     @GetMapping("/latest")
-    public List<AggregatedPrice> getLatestPrice() {
-        return priceAggregationService.getLatestPrice();
+    public TFResponse<List<AggregatedPrice>> getLatestPrice() {
+        return TFResponse.<List<AggregatedPrice>>builder().data(priceAggregationService.getLatestPrice()).build();
     }
 }
