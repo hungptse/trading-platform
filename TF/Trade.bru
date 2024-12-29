@@ -1,0 +1,24 @@
+meta {
+  name: Trade
+  type: http
+  seq: 5
+}
+
+post {
+  url: http://localhost:8080/api/trade/send
+  body: json
+  auth: none
+}
+
+headers {
+  TF-USER: 1000
+}
+
+body:json {
+  {
+    "tradingPair" : "BTCUSDT",
+    "orderType" : "BUY",
+    "quantity" : 0.1,
+    "userId" : 1000
+  } 
+}
